@@ -98,6 +98,8 @@
             
             var mySwiper = new Swiper ('.swiper-container', {
                 parallax : true,
+                nextButton: '.swiper-button-next',
+                prevButton: '.swiper-button-prev',
                 onInit:function(swiper){
                     //设置最开始的3个slider
                     _current++;
@@ -107,35 +109,40 @@
                     
                 },
                 onSlidePrevStart: function(swiper){
-                    // alert('prev;');
-                   var _current=parseInt(mySwiper.slides[swiper.activeIndex].id.split("-")[1]);
-                   /*
+                    //向上一页滑动，activeIndex是上一页的
+                   var _current=parseInt(mySwiper.slides[swiper.activeIndex+1].id.split("-")[1]);
+                   
                     if(_current-(COOKIENUM+1)>0){
-                        mySwiper.appendSlide('<div class="swiper-slide" id="slider-'+(_current-(COOKIENUM+1))+'"><div data-swiper-parallax="-100"><p id="content-'+(_current-(COOKIENUM+1))+'"></p></div></div>');
+                        if($("#slider-"+(_current-(COOKIENUM+1))).length>0){return;}
+                        mySwiper.prependSlide('<div class="swiper-slide" id="slider-'+(_current-(COOKIENUM+1))+'"><div data-swiper-parallax="-100"><p id="content-'+(_current-(COOKIENUM+1))+'"></p></div></div>');
                         getContent(_id,_current-(COOKIENUM+1),"content-"+(_current-(COOKIENUM+1)));
                     }
-                    if(1){
-                        //就不删除后面的了
-                    }
-*/
+                   
+
+                   // alert(_current);
                     console.log("pre:"+_current);
                 },
                 onSlideNextStart: function(swiper){
                     // alert('next;');
-                    //mySwiper.slides[0]
-                    //var _current=swiper.activeIndex+1;
+
+                    //向下一页划动，activeIndex是下一页的
                     var _current=parseInt(mySwiper.slides[swiper.activeIndex-1].id.split("-")[1]);
-                    //alert(_current);
                     if(_current<_content.total-COOKIENUM){
+                        //预加载当前页之后第COOKIENUM+1页，当前页的下一页将是“当前页”，保持时刻在“当前页”之后有COOKINUM页被缓存
                         if($("#slider-"+(_current+(COOKIENUM+1))).length>0){return;}
                         mySwiper.appendSlide('<div class="swiper-slide" id="slider-'+(_current+(COOKIENUM+1))+'"><div data-swiper-parallax="-100"><p id="content-'+(_current+(COOKIENUM+1))+'"></p></div></div>');
                         getContent(_id,_current+(COOKIENUM+1),"content-"+(_current+(COOKIENUM+1)));
                     }
-                    if(_current-COOKIENUM>0){
-                        //移除点之前的页面，避免内存过大
-                        //mySwiper.removeSlide(0);
-                    }
+                    
                     console.log("next:"+_current);                    
+                },
+                onSlideNextEnd: function(swiper){
+                    var _current=parseInt(mySwiper.slides[swiper.activeIndex].id.split("-")[1]);
+                    //alert(_current);
+                    if(_current-COOKIENUM-1>0){
+                        //移除点之前的页面，避免内存过大.保留当前页前两页
+                        mySwiper.removeSlide(0);
+                    }
                 },
                 onClick: function(swiper){
                     // alert('你点了Swiper'+swiper.activeIndex);//1
@@ -143,7 +150,7 @@
                     // alert(mySwiper.clickedSlide.id);//slide0
                     // alert(mySwiper.bullets[1].id);
                     // alert(mySwiper.slides[1].id);
-                        console.log("now:"+swiper.activeIndex);
+                        //console.log("now:"+swiper.activeIndex);
                 },
                 
             });
@@ -183,6 +190,9 @@
 					</div>
 				</div>
 			</div>
+
+			<div class="swiper-button-prev"></div>
+			<div class="swiper-button-next"></div>
 		</div>
 	</div>
 
