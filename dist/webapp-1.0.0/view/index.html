@@ -11,7 +11,6 @@
 	<script src="../plugins/bootstrap/js/bootstrap.min.js"></script>
 	<script src="../plugins/swiper/js/swiper.jquery.min.js"></script>
 	<link rel="stylesheet" href="../plugins/swiper/css/swiper.min.css">
-	<script src="../js/app/content.js"></script>
 	<style>
 		body,
 		html {
@@ -36,40 +35,35 @@
 			width: 100%;
 			height: 100%;
 		}
+		
+		.custom-img {
+			width: 100%;
+		}
 	</style>
 
 	<script type="text/javascript">
-        var _id="w00001";
         var _current=0;
         var COOKIENUM=2;
         var _content=(function(){
-            id="";
-            name="";
-            author="";
             current=0;            
             total=0;
-            value="";
+            url="";
             end=false;
-            return {
-                id:id,
-                name:name,
-                author:author,
+            return {               
                 total:total,
                 current:current,
-                value:value,
+                url:url,
                 end:end
 
             }
         })();
-        function getContent(id,current,domid){
+        function getContent(current,domid){
             var responsedata={};
-            var requestdata='{"id":"'+id+'","current":'+current+'}';
             _content.end=false;
             $.ajax({
                 cache: true,
-                type: "POST",
-                url:'http://wx.jacean.cn/',
-                data:requestdata,
+                type: "GET",
+                url:'../server/ajaxResp.php?current='+current,
                 async: true,
                 processData: false,  // 告诉jQuery不要去处理发送的数据
                 contentType: false,   // 告诉jQuery不要去设置Content-Type请求头
@@ -77,17 +71,12 @@
                     //alert("error"+request);
                     console.log(request);
                 },
-                success: function(data) {
-                    //responsedata=data;
-                    
+                success: function(data) {                    
                     for(var n in data){
                         _content[n] = data[n];
                     }
-                    _content.end=true; 
-                    var head="<h1>"+_content.name+"</h1>";
-                    head+="<h5>"+_content.author+"</h5>";
-                    head+="<small>"+_content.current+"/"+_content.total+"</small><br><br>"                   
-                    $("#"+domid).html(head+_content.value);
+                    _content.end=true;                                     
+                    $("#"+domid).attr("src",_content.url);
                 },
                 dataType: "json"
             });
@@ -97,15 +86,13 @@
         window.onload = function() {
             
             var mySwiper = new Swiper ('.swiper-container', {
-                parallax : true,
-                nextButton: '.swiper-button-next',
-                prevButton: '.swiper-button-prev',
+                autoHeight: true, 
                 onInit:function(swiper){
                     //设置最开始的3个slider
                     _current++;
-                    getContent(_id,_current,"content-1");
-                    getContent(_id,_current+1,"content-2");
-                    getContent(_id,_current+2,"content-3");
+                    getContent(_current,"img-1");
+                    getContent(_current+1,"img-2");
+                    getContent(_current+2,"img-3");
                     
                 },
                 onSlidePrevStart: function(swiper){
@@ -114,11 +101,9 @@
                    
                     if(_current-(COOKIENUM+1)>0){
                         if($("#slider-"+(_current-(COOKIENUM+1))).length>0){return;}
-                        mySwiper.prependSlide('<div class="swiper-slide" id="slider-'+(_current-(COOKIENUM+1))+'"><div data-swiper-parallax="-100"><p id="content-'+(_current-(COOKIENUM+1))+'"></p></div></div>');
-                        getContent(_id,_current-(COOKIENUM+1),"content-"+(_current-(COOKIENUM+1)));
+                        mySwiper.prependSlide('<div class="swiper-slide" id="slider-'+(_current-(COOKIENUM+1))+'"><img class="custom-img" id="img-'+(_current-(COOKIENUM+1))+'"></div>');
+                        getContent(_current-(COOKIENUM+1),"img-"+(_current-(COOKIENUM+1)));
                     }
-                   
-
                    // alert(_current);
                     console.log("pre:"+_current);
                 },
@@ -130,8 +115,8 @@
                     if(_current<_content.total-COOKIENUM){
                         //预加载当前页之后第COOKIENUM+1页，当前页的下一页将是“当前页”，保持时刻在“当前页”之后有COOKINUM页被缓存
                         if($("#slider-"+(_current+(COOKIENUM+1))).length>0){return;}
-                        mySwiper.appendSlide('<div class="swiper-slide" id="slider-'+(_current+(COOKIENUM+1))+'"><div data-swiper-parallax="-100"><p id="content-'+(_current+(COOKIENUM+1))+'"></p></div></div>');
-                        getContent(_id,_current+(COOKIENUM+1),"content-"+(_current+(COOKIENUM+1)));
+                        mySwiper.appendSlide('<div class="swiper-slide" id="slider-'+(_current+(COOKIENUM+1))+'"><img class="custom-img" id="img-'+(_current+(COOKIENUM+1))+'"></div>');
+                        getContent(_current+(COOKIENUM+1),"img-"+(_current+(COOKIENUM+1)));
                     }
                     
                     console.log("next:"+_current);                    
@@ -139,18 +124,10 @@
                 onSlideNextEnd: function(swiper){
                     var _current=parseInt(mySwiper.slides[swiper.activeIndex].id.split("-")[1]);
                     //alert(_current);
-                    if(_current-COOKIENUM-1>0){
-                        //移除点之前的页面，避免内存过大.保留当前页前两页
-                        mySwiper.removeSlide(0);
-                    }
+                   
                 },
                 onClick: function(swiper){
-                    // alert('你点了Swiper'+swiper.activeIndex);//1
-                    // alert(mySwiper.clickedIndex);//1
-                    // alert(mySwiper.clickedSlide.id);//slide0
-                    // alert(mySwiper.bullets[1].id);
-                    // alert(mySwiper.slides[1].id);
-                        //console.log("now:"+swiper.activeIndex);
+                    
                 },
                 
             });
@@ -164,35 +141,18 @@
 <body>
 	<div class="container-fluid">
 		<div class="swiper-container">
-			<div class="parallax-bg" style="background-image:url(../image/ning0.jpg);opacity:0.3" data-swiper-parallax="-23%" data-swiper-parallax-duration="1000"></div>
-
 			<div class="swiper-wrapper">
-				<!--ajax触发加载，预加载3页前后的-->
-				<!--onSlidePrevStart
-                onSlidePrevEnd-->
 
 				<div class="swiper-slide" id="slider-1">
-					<div data-swiper-parallax="-100">
-						<p id="content-1">
-						</p>
-					</div>
+					<img src="" id="img-1" class="custom-img" alt="">
 				</div>
-				<div class="swiper-slide" id="slider-2">
-					<div data-swiper-parallax="-100">
-						<p id="content-2">
-						</p>
-					</div>
+				<div class="swiper-slide" class="custom-img" id="slider-2">
+					<img src="" id="img-2" alt="">
 				</div>
-				<div class="swiper-slide" id="slider-3">
-					<div data-swiper-parallax="-100">
-						<p id="content-3">
-						</p>
-					</div>
+				<div class="swiper-slide" class="custom-img" id="slider-3">
+					<img src="" id="img-3" alt="">
 				</div>
 			</div>
-
-			<div class="swiper-button-prev"></div>
-			<div class="swiper-button-next"></div>
 		</div>
 	</div>
 

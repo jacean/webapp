@@ -50,5 +50,13 @@ module.exports = {
         settings:{
 
         }
+    },
+    
+    server:{
+        src:src+"/server/*.php",
+        dest:dest,
+        settings:{
+
+        }
     }
 };

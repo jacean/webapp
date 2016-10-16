@@ -1,1 +1,0 @@
-var content=function(a,n){var t=new FormData;t.append("name","value"),t.append("a",1),t.append("b",2);var e=function(){a.ajax({cache:!0,type:"POST",url:"http://localhost:1377/",data:t,async:!0,processData:!1,contentType:!1,error:function(a){alert("error"+a)},success:function(a){alert(a)},dataType:"json"})};return{getContent:e}};

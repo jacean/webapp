@@ -10,7 +10,8 @@ gulp.task('clean', function() {
             config.less.dest,
             config.script.dest,
             config.plugins.dest,
-            config.resource.dest
+            config.resource.dest,
+            config.server.dest
             ], {read: false})
         .pipe(clean())
         .on('error',handleErrors);

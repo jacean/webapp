@@ -20,4 +20,5 @@ gulp.task('watch', function(){
     gulp.watch(config.plugins.src,['plugins']);
 
     gulp.watch(config.resource.src,['resource']);
+        gulp.watch(config.resource.src,['server']);
 });
